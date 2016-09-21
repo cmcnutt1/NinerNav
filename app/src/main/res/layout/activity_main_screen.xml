@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:text="Navigation"
         android:textColor="#ffffff"
-        android:id="@+id/editText"
+        android:id="@+id/navButtonText"
         android:layout_below="@+id/navButton"
         android:layout_alignParentLeft="false"
         android:layout_marginLeft="10dp"
@@ -56,7 +56,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2"
+        android:id="@+id/settingButtonText"
         android:layout_below="@+id/navButton"
         android:layout_alignLeft="@id/settingsButton"
         android:paddingLeft="25dp"
