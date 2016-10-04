@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 public class MainScreen extends AppCompatActivity {
@@ -16,7 +15,7 @@ public class MainScreen extends AppCompatActivity {
 
 
         //Button Listener for Navigation Button
-        ImageButton navButton = (ImageButton)findViewById(R.id.navButton);
+        ImageButton navButton = (ImageButton)findViewById(R.id.mapButton);
         assert navButton != null;
         navButton.setOnClickListener(new View.OnClickListener(){
             @Override

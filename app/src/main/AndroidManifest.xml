@@ -33,6 +33,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="niners.ninernav.MainScreen" />
         </activity>
+        <activity android:name=".NavScreen"></activity>
     </application>
 
 </manifest>
