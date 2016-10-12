@@ -46,7 +46,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/mapButton"
-        android:src="@drawable/anotherMapIcon"
+        android:src="@drawable/anothermapicon"
         android:background="#cccc00"
         android:layout_below="@+id/navButtonText"
         android:layout_centerHorizontal="true"
