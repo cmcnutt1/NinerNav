@@ -20,7 +20,7 @@ public class MainScreen extends AppCompatActivity {
         navButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent i = new Intent(getApplicationContext(), NavigationScreen.class);
+                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
                 startActivity(i);
             }
         });

@@ -4,22 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
-    android:paddingTop="10dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
     tools:context="niners.ninernav.MainScreen"
     android:background="#003300">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="NinerNav"
-        android:textSize="40dp"
-        android:textColor="#cccc00"
-        android:id="@+id/Header"
-        android:layout_marginTop="46dp"
-        android:layout_below="@+id/searchView2"
-        android:layout_centerHorizontal="true" />
 
     <ImageButton
         android:layout_width="300dp"
@@ -62,21 +51,31 @@
         android:layout_below="@+id/mapButton"
         android:layout_centerHorizontal="true" />
 
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchView2"
+        android:background="#ffffff"
+        android:layout_alignParentTop="true" />
+
     <ImageButton
         android:layout_width="70dp"
         android:layout_height="48dp"
         android:src = "@drawable/settingsicon"
         android:id="@+id/settingsButton"
-        android:background="#ffffff"
-        android:layout_alignParentTop="true"
+        android:background="#cccc00"
+        android:layout_below="@+id/searchView2"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <SearchView
-        android:layout_width="320dp"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/searchView2"
-        android:background="#ffffff"
-        android:layout_alignTop="@+id/settingsButton" />
+        android:text="NinerNav"
+        android:textSize="40dp"
+        android:textColor="#cccc00"
+        android:id="@+id/Header"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/searchView2" />
 
 </RelativeLayout>
