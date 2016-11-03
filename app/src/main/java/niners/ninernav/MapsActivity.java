@@ -46,8 +46,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng unccUnion = new LatLng(35.308406, -80.733683);
         float startingZoomLvl = 17;
         float minimumZoomLvl = 10;
-        LatLng SW = new LatLng(35.296453, -80.742923);
-        LatLng NE = new LatLng(35.316295, -80.721168);
+        LatLng SW = new LatLng(35.300000, -80.744298);
+        LatLng NE = new LatLng(35.313402, -80.721168);
         LatLngBounds mapBound = new LatLngBounds(SW, NE);
         mMap.addMarker(new MarkerOptions().position(unccUnion).title("Student Union"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(unccUnion, startingZoomLvl));
