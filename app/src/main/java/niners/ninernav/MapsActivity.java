@@ -1,6 +1,8 @@
 package niners.ninernav;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.*;
@@ -8,6 +10,7 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.app.AlertDialog.Builder;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Double userLat;
     private Double userLong;
     private ArrayAdapter<String> places;
+
 
     private String[] buildingNames = new String[]{
             //Academic Buildings
@@ -163,6 +167,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         textEntry.setAdapter(places);
         textEntry.setThreshold(1);
 
+
         //Set up location manager and listener
         locManage = (LocationManager) getSystemService(LOCATION_SERVICE);
         locListen = new android.location.LocationListener() {
@@ -186,8 +191,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onProviderDisabled(String provider) {
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
+                final android.app.AlertDialog.Builder locationAlert = new android.app.AlertDialog.Builder(MapsActivity.this);
+
+                locationAlert.setMessage("Please turn location services on");
+                locationAlert.setPositiveButton("Okay", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface v, int j){
+                        Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(i);
+                    }
+                });
+
+                locationAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface v, int k){
+                    }
+                });
+
+                AlertDialog dialog = locationAlert.show();
+
+
             }
         };
 
@@ -199,6 +220,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             return;
         }
+
+        //Get updates from location manager every 5 seconds (5000 milliseconds) from "network" (wifi coordinates)
         locManage.requestLocationUpdates("network", 5000, 0, locListen);
 
     }
