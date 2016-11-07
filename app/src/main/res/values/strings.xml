@@ -31,6 +31,7 @@
         <item>-1</item>
     </string-array>
 
+
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
 
@@ -64,4 +65,106 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_maps">Map</string>
+
+    <string-array name="buildingNames">
+        <item>Atkins</item>
+        <item>Barnard</item>
+        <item>Belk Gym</item>
+        <item>Bioinformatics</item>
+        <item>Burson</item>
+        <item>Cameron Hall</item>
+        <item>College of Education</item>
+        <item>Colvard</item>
+        <item>Denny</item>
+        <item>Duke</item>
+        <item>EPIC</item>
+        <item>Fretwell</item>
+        <item>Friday</item>
+        <item>Garinger</item>
+        <item>Grigg</item>
+        <item>Health and Human Services</item>
+        <item>Johnson Center</item>
+        <item>Kulwicki</item>
+        <item>Macy</item>
+        <item>McEniry</item>
+        <item>Memorial Hall</item>
+        <item>Motorsports Research</item>
+        <item>PORTAL</item>
+        <item>Robinson</item>
+        <item>Rowe</item>
+        <item>Smith</item>
+        <item>Storrs</item>
+        <item>Winningham</item>
+        <item>Woodward</item>
+        <item>Auxiliary Services</item>
+        <item>Barnhardt (Student Activity Center/Halton Arena)</item>
+        <item>Cafeteria Activities Building</item>
+        <item>Cone</item>
+        <item>Counseling Center</item>
+        <item>Facilities Management</item>
+        <item>Facilities Operations/Parking Services</item>
+        <item>Hayes Stadium</item>
+        <item>McMillan Greenhouse</item>
+        <item>Miltimore-Wallis Center</item>
+        <item>Campus Police</item>
+        <item>Student Health Center</item>
+        <item>Cato Hall</item>
+        <item>Kennedy</item>
+        <item>King</item>
+        <item>Reese</item>
+        <item>Belk Plaza</item>
+        <item>Halton Wagner Complex</item>
+        <item>Harris Alumni Center</item>
+        <item>Hauser Alumni Pavilion</item>
+        <item>Irwin Belk Track and Field</item>
+        <item>Richardson Stadium</item>
+        <item>Niner House</item>
+        <item>Prospector</item>
+        <item>SoVi</item>
+        <item>Student Union</item>
+        <item>Belk Hall</item>
+        <item>Cedar Hall</item>
+        <item>Elm Hall</item>
+        <item>Greek Village</item>
+        <item>Hawthorn Hall</item>
+        <item>Hickory Hall</item>
+        <item>Holshouser Hall</item>
+        <item>Hunt Hall</item>
+        <item>Laurel Hall</item>
+        <item>Levine Hall</item>
+        <item>Lynch Hall</item>
+        <item>Maple Hall</item>
+        <item>Martin Hall</item>
+        <item>Moore Hall</item>
+        <item>Miltimore Hall</item>
+        <item>Oak Hall</item>
+        <item>Pine Hall</item>
+        <item>Sanford Hall</item>
+        <item>Scott Hall</item>
+        <item>Sycamore Hall</item>
+        <item>Wallis Hall</item>
+        <item>Witherspoon Hall</item>
+        /Academic Building Abbreviations
+        <item>ATKNS (Atkins)</item>
+        <item>BIOIN (Bioinformatics)</item>
+        <item>BRNRD (Barnard)</item>
+        <item>BURSN (Burson)</item>
+        <item>CARC (Cameron)</item>
+        <item>CHHS (College of Health and Human Services)</item>
+        <item>COED (College of Education)</item>
+        <item>COLVD (Colvard)</item>
+        <item>FRET (Fretwell)</item>
+        <item>FRIDY (Friday)</item>
+        <item>GRNGR (Garinger)</item>
+        <item>GYMNS (Belk Gym)</item>
+        <item>HEALC (Student Health Center)</item>
+        <item>JBCB (Johnson Center)</item>
+        <item>MCEN (McEniry)</item>
+        <item>MCMIL (McMillan)</item>
+        <item>MEMOR (Memorial Hall)</item>
+        <item>ROBIN (Robinson)</item>
+        <item>WINN (Winningham)</item>
+        <item>WOODW (Woodward)</item>
+    </string-array>
+
 </resources>

@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
@@ -146,14 +147,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        AutoCompleteTextView textEntry = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+        //Set variable for Auto complete text view. set onclick listener that clears text when clicked
+        final AutoCompleteTextView textEntry = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
         assert textEntry != null;
+        textEntry.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                textEntry.setText("");
+            }
+        });
 
+        //To allow buildings to be referenced by auto complete text view
         places = new ArrayAdapter<String>(this, android.R.layout.select_dialog_item, buildingNames);
 
         textEntry.setAdapter(places);
         textEntry.setThreshold(1);
 
+        //Set up location manager and listener
         locManage = (LocationManager) getSystemService(LOCATION_SERVICE);
         locListen = new android.location.LocationListener() {
             @Override
@@ -162,7 +172,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 userLat = location.getLatitude();
                 userLong = location.getLongitude();
                 LatLng userLoc = new LatLng(userLat, userLong);
-                //mMap.addMarker(new MarkerOptions().position(userLoc).title("You are here"));
 
             }
 
@@ -230,6 +239,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+
+
     }
 
     @Override
