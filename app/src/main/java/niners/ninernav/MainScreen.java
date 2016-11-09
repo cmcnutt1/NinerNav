@@ -26,12 +26,12 @@ public class MainScreen extends AppCompatActivity {
         });
 
         //Button Listener for Settings Button
-        ImageButton settingsButton = (ImageButton)findViewById(R.id.settingsButton);
+        ImageButton settingsButton = (ImageButton)findViewById(R.id.navButton);
         assert settingsButton != null;
         settingsButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent j = new Intent(getApplicationContext(), SettingsScreen.class);
+                Intent j = new Intent(getApplicationContext(), NavScreen.class);
                 startActivity(j);
             }
         });

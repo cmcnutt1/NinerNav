@@ -33,6 +33,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locManage;
     private Double userLat;
     private Double userLong;
+    private LatLng userLoc;
     private ArrayAdapter<String> places;
 
 
@@ -176,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 userLat = location.getLatitude();
                 userLong = location.getLongitude();
-                LatLng userLoc = new LatLng(userLat, userLong);
+                userLoc = new LatLng(userLat, userLong);
 
             }
 
@@ -222,7 +223,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         //Get updates from location manager every 5 seconds (5000 milliseconds) from "network" (wifi coordinates)
-        locManage.requestLocationUpdates("network", 5000, 0, locListen);
+        locManage.requestLocationUpdates("network",5000,0,locListen);
+
 
     }
 
@@ -262,6 +264,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                if (mMap.getCameraPosition().zoom < 12){
+
+                }
+            }
+        });
 
 
     }
