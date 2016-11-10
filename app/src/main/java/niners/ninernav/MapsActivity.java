@@ -1,17 +1,25 @@
 package niners.ninernav;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.*;
+import android.os.Build;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.app.AlertDialog.Builder;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.internal.zzpu;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,10 +29,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -35,6 +53,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Double userLong;
     private LatLng userLoc;
     private ArrayAdapter<String> places;
+    private GoogleApiClient mGAPIC;
+    private Places mPlaces;
+    private HashMap<String, LatLng> coordinates;
 
 
     private String[] buildingNames = new String[]{
@@ -56,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "Grigg",
             "Health & Human Services",
             "Johnson Center",
-            "Kulwicki",
+            "Kulwicki",  //17
             "Macy",
             "McEniry",
             "Memorial Hall",
@@ -74,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "Cafeteria Activities Building",
             "Cone",
             "Counseling Center",
-            "Facilities Management",
+            "Facilities Management", //34
             "Facilities Operations/Parking Services",
             "Hayes Stadium",
             "McMillan Greenhouse",
@@ -91,11 +112,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "Hauser Alumni Pavilion",
             "Irwin Belk Track & Field",
             "Richardson Stadium",
-            "Niner House",
+            "Niner House", //51
             //Food Services
             "Prospector",
             "SoVi",
-            "Student Union",
+            "Student Union", //54
             //Residence Halls
             "Belk Hall",
             "Cedar Hall",
@@ -118,9 +139,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "Scott Hall",
             "Sycamore Hall",
             "Wallis Hall",
-            "Witherspoon Hall",
+            "Witherspoon Hall", //76
             //Academic Building Abbreviations
-            "ATKNS (Atkins)",
+            "ATKNS (Atkins)", //77
             "BIOIN (Bioinformatics)",
             "BRNRD (Barnard)",
             "BURSN (Burson)",
@@ -139,10 +160,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "MEMOR (Memorial Hall)",
             "ROBIN (Robinson)",
             "WINN (Winningham)",
-            "WOODW (Woodward)"
+            "WOODW (Woodward)" //96
 
     };
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,21 +174,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //Set variable for Auto complete text view. set onclick listener that clears text when clicked
-        final AutoCompleteTextView textEntry = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+        coordinates = new HashMap<String, LatLng>();
+        loadBuildingHash();
+
+        final AutoCompleteTextView textEntry =(AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
+
+        //set onclick listener that clears text when clicked and onItemSelected listener for when user chooses search result
         assert textEntry != null;
         textEntry.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 textEntry.setText("");
             }
+
         });
+
+
 
         //To allow buildings to be referenced by auto complete text view
         places = new ArrayAdapter<String>(this, android.R.layout.select_dialog_item, buildingNames);
 
         textEntry.setAdapter(places);
         textEntry.setThreshold(1);
+
+        final InputMethodManager imm = (InputMethodManager)getSystemService(this.INPUT_METHOD_SERVICE);
+
+        textEntry.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String userSelection = textEntry.getText().toString();
+                LatLng buildingCoord = coordinates.get(userSelection);
+                imm.hideSoftInputFromWindow(textEntry.getWindowToken(), 0);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(buildingCoord, 18));
+            }
+        });
+        
 
 
         //Set up location manager and listener
@@ -268,11 +310,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
-                if (mMap.getCameraPosition().zoom < 12){
-
+                if (mMap.getCameraPosition().zoom < 16){
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(16));
                 }
             }
         });
+
+
 
 
     }
@@ -284,6 +328,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         }
+
+    }
+
+    public void loadBuildingHash(){
+
+        //Atkins
+        coordinates.put(buildingNames[77], new LatLng(35.305472, -80.732210));
+        //Bioinformatics
+        coordinates.put(buildingNames[78], new LatLng(35.312520, -80.741844));
+        //Barnard
+        coordinates.put(buildingNames[79], new LatLng(35.305887, -80.729845));
+        //Burson
+        coordinates.put(buildingNames[80], new LatLng(35.307703, -80.732476));
+        //Cameron
+        coordinates.put(buildingNames[81], new LatLng(35.307712, -80.731170));
+        //CHHS
+        coordinates.put(buildingNames[82], new LatLng(35.307555, -80.733402));
+        //COED
+        coordinates.put(buildingNames[83], new LatLng(35.307594, -80.734059));
+        //Colvard
+        coordinates.put(buildingNames[84], new LatLng(35.304860, -80.731748));
+        //Fretwell
+        coordinates.put(buildingNames[85], new LatLng(35.306014, -80.729420));
+        //Friday
+        coordinates.put(buildingNames[86], new LatLng(35.306329, -80.730243));
+        //Garinger
+        coordinates.put(buildingNames[87], new LatLng(35.305020, -80.729886));
+        //Belk Gym
+        coordinates.put(buildingNames[88], new LatLng(35.305383, -80.735206));
+        //Student Health Center
+        coordinates.put(buildingNames[89], new LatLng(35.310690, -80.729722));
+        //Johnson Center
+        coordinates.put(buildingNames[90], new LatLng(35.304151, -80.728858));
+        //McEniry
+        coordinates.put(buildingNames[91], new LatLng(35.307024, -80.730331));
+        //McMillan
+        coordinates.put(buildingNames[92], new LatLng(35.307802, -80.729754));
+        //Memorial Hall
+        coordinates.put(buildingNames[93], new LatLng(35.303823, -80.735707));
+        //Robinson
+        coordinates.put(buildingNames[94], new LatLng(35.304272, -80.729907));
+        //Winningham
+        coordinates.put(buildingNames[95], new LatLng(35.305168, -80.730375));
+        //Woodward
+        coordinates.put(buildingNames[96], new LatLng(35.307589, -80.735593));
+
 
     }
 }

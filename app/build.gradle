@@ -27,6 +27,7 @@ dependencies {
     //compile 'com.android.support:multidex:1.0.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services-places:9.4.0'
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-appindexing:9.4.0'
 }
