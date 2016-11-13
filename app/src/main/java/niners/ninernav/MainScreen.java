@@ -27,6 +27,7 @@ public class MainScreen extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext(), MapsActivity.class);
                 i.putExtra("calledActivity", 1);
                 startActivity(i);
+                System.gc();
             }
         });
 
@@ -38,9 +39,10 @@ public class MainScreen extends AppCompatActivity {
             public void onClick(View v){
                 Intent j = new Intent(getApplicationContext(), NavScreen.class);
                 startActivity(j);
+                System.gc();
             }
         });
-    }
 
+    }
 
 }

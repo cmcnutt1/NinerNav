@@ -61,7 +61,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
-import com.squareup.leakcanary.LeakCanary;
 
 import android.util.Log;
 import android.view.View;
@@ -221,13 +220,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-        LeakCanary.install(this.getApplication());
-
 
         coordinates = new HashMap<String, LatLng>();
         loadBuildingHash();
@@ -251,6 +243,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         textEntry.setAdapter(places);
         textEntry.setThreshold(1);
+
 
         final InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
 
@@ -338,6 +331,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if((this.getIntent().getExtras().getInt("calledActivity") == 2) && !(this.getIntent().equals(null))){
             inNavMode = true;
             parent_intent = this.getIntent();
+        }
+        else if ((this.getIntent().getExtras().getInt("calledActivity") == 1)){
+            inNavMode = false;
+            if(mMap != null){
+                mMap.clear();
+            }
         }
 
 
@@ -588,16 +587,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
         if(mMap!=null)
         {
-            mMap = null;
-            locListen = null;
-            locManage = null;
-            mapFragment = null;
-            coordinates = null;
-            buildingNames = null;
-            places = null;
-            pin = null;
-            overlay = null;
-            System.gc();
+
+            mMap.clear();
             finish();
 
 
@@ -611,19 +602,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onDestroy();
 
         if(mMap != null){
+            mMap.clear();
+            navLine = null;
             mMap = null;
-            locListen = null;
-            locManage = null;
-            mapFragment = null;
-            coordinates = null;
-            buildingNames = null;
-            places = null;
-            pin = null;
-            overlay = null;
-            System.gc();
             finish();
 
 
         }
+    }
+
+    @Override
+    public void onBackPressed(){
+
+        super.onBackPressed();
+
+        mMap.clear();
     }
 }
