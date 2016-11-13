@@ -4,13 +4,15 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
+    useLibrary 'org.apache.http.legacy'
+
     defaultConfig {
         applicationId "niners.ninernav"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        //multiDexEnabled true
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -30,4 +32,12 @@ dependencies {
     compile 'com.google.android.gms:play-services-places:9.4.0'
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-appindexing:9.4.0'
+
+    compile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+
+    compile 'com.akexorcist:googledirectionlibrary:1.0.4'
+
 }

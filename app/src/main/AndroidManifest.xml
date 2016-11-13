@@ -28,7 +28,8 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_navigation_screen"
             android:parentActivityName=".MainScreen"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/FullscreenTheme"
+            android:screenOrientation="locked">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="niners.ninernav.MainScreen" />
@@ -56,7 +57,9 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="locked"
+            android:noHistory="true"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
             android:name="com.google.android.gms.version"

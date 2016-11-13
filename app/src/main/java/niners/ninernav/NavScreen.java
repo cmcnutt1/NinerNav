@@ -1,16 +1,23 @@
 package niners.ninernav;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.HashMap;
 
 public class NavScreen extends AppCompatActivity {
 
@@ -118,7 +125,8 @@ public class NavScreen extends AppCompatActivity {
             "MEMOR (Memorial Hall)",
             "ROBIN (Robinson)",
             "WINN (Winningham)",
-            "WOODW (Woodward)"
+            "WOODW (Woodward)",
+            "My Location"
 
     };
     /**
@@ -134,6 +142,9 @@ public class NavScreen extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        final InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+
 
         final AutoCompleteTextView fromEntry = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView2);
         final AutoCompleteTextView toEntry = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView3);
@@ -158,6 +169,35 @@ public class NavScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 toEntry.setText("");
+            }
+        });
+
+        fromEntry.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                imm.hideSoftInputFromWindow(fromEntry.getWindowToken(), 0);
+            }
+        });
+
+        toEntry.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                imm.hideSoftInputFromWindow(toEntry.getWindowToken(), 0);
+            }
+        });
+
+        final Button go = (Button) findViewById(R.id.button6);
+
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                i.putExtra("from", fromEntry.getText().toString());
+                i.putExtra("to", toEntry.getText().toString());
+                i.putExtra("mode", true);
+                i.putExtra("calledActivity", 2);
+
+                startActivity(i);
             }
         });
     }
