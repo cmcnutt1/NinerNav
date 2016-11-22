@@ -154,15 +154,15 @@ public class NavScreen extends AppCompatActivity {
         fromEntry.setAdapter(places);
         fromEntry.setThreshold(1);
 
-        toEntry.setAdapter(places);
-        toEntry.setThreshold(1);
-
         fromEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fromEntry.setText("");
             }
         });
+
+        toEntry.setAdapter(places);
+        toEntry.setThreshold(1);
 
         toEntry.setOnClickListener(new View.OnClickListener() {
 
@@ -171,6 +171,10 @@ public class NavScreen extends AppCompatActivity {
                 toEntry.setText("");
             }
         });
+
+
+
+
 
         fromEntry.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

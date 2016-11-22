@@ -54,6 +54,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -68,6 +69,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -92,13 +94,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static LatLng navTo;
     private static int parent_id;
     private static Intent parent_intent;
+    private static boolean locationStatus = true;
 
     private static ArrayAdapter<String> places;
     private static GoogleApiClient mGAPIC;
     private static Places mPlaces;
     private static HashMap<String, LatLng> coordinates;
+    private static ArrayList<Polygon> clickables;
+    private static HashMap<Polygon, String> polyInfo;
     private static boolean inNavMode = false;
     private static Polyline navLine;
+    private static Button goButton;
+    private static Button cancelButton;
+
     private static Bundle extras;
     //privte String marker_image = Context.getApplicationInfo().dataDir;
     private static BitmapDescriptor pin;
@@ -111,83 +119,66 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "Belk Gym",
             "Bioinformatics",
             "Burson",
-            "Cameron Hall",
+            "Cameron Hall", //5
             "College of Education",
             "Colvard",
+            "Cone",
             "Denny",
-            "Duke",
+            "Duke", //10
             "EPIC",
             "Fretwell",
             "Friday",
             "Garinger",
-            "Grigg",
+            "Grigg", //15
             "Health & Human Services",
-            "Johnson Center",
-            "Kulwicki",  //17
+            "Johnson Center", //17
             "Macy",
             "McEniry",
+            "McMillan", //20
             "Memorial Hall",
             "Motorsports Research",
             "PORTAL",
             "Robinson",
-            "Rowe",
+            "Rowe", //25
             "Smith",
             "Storrs",
-            "Winningham",
-            "Woodward",
-            //Other Service Buildings
-            "Auxiliary Services",
-            "Barnhardt (Student Activity Center/Halton Arena)",
-            "Cafeteria Activities Building",
-            "Cone",
-            "Counseling Center",
-            "Facilities Management", //34
-            "Facilities Operations/Parking Services",
-            "Hayes Stadium",
-            "McMillan Greenhouse",
-            "Miltimore-Wallis Center",
-            "Campus Police",
             "Student Health Center",
+            "Winningham",
+            "Woodward", //30
+            //Other Service Buildings
+            "Barnhardt (Student Activity Center/Halton Arena)",
             "Cato Hall",
             "Kennedy",
-            "King",
-            "Reese",
-            "Belk Plaza",
-            "Halton Wagner Complex",
-            "Harris Alumni Center",
-            "Hauser Alumni Pavilion",
-            "Irwin Belk Track & Field",
-            "Richardson Stadium",
-            "Niner House", //51
+            "Reese",//51
             //Food Services
             "Prospector",
-            "SoVi",
+            "SoVi Dining Hall",
             "Student Union", //54
             //Residence Halls
-            "Belk Hall",
+            "Belk Hall",//38
             "Cedar Hall",
-            "Elm Hall",
+            "Elm Hall", //40
             "Greek Village",
-            "Hawthorn Hall",
+            "Hawthorn Hall",//42
             "Hickory Hall",
-            "Holshouser Hall",
+            "Holshouser Hall",//44
             "Hunt Hall",
-            "Laurel Hall",
+            "Laurel Hall",//46
             "Levine Hall",
-            "Lynch Hall",
+            "Lynch Hall",//48
             "Maple Hall",
-            "Martin Hall",
+            "Martin Hall",//50
             "Moore Hall",
-            "Miltimore Hall",
+            "Miltimore Hall",//52
             "Oak Hall",
-            "Pine Hall",
+            "Pine Hall",//54
             "Sanford Hall",
-            "Scott Hall",
+            "Scott Hall",//56
             "Sycamore Hall",
-            "Wallis Hall",
-            "Witherspoon Hall", //76
+            "Wallis Hall",//58
+            "Witherspoon Hall", //59
             //Academic Building Abbreviations
-            "ATKNS (Atkins)", //77
+            "ATKNS (Atkins)", //60
             "BIOIN (Bioinformatics)",
             "BRNRD (Barnard)",
             "BURSN (Burson)",
@@ -206,7 +197,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             "MEMOR (Memorial Hall)",
             "ROBIN (Robinson)",
             "WINN (Winningham)",
-            "WOODW (Woodward)" //96
+            "WOODW (Woodward)" //79
+
 
     };
 
@@ -219,6 +211,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
 
 
         coordinates = new HashMap<String, LatLng>();
@@ -257,6 +251,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String userSelection = textEntry.getText().toString();
                 LatLng buildingCoord = coordinates.get(userSelection);
                 imm.hideSoftInputFromWindow(textEntry.getWindowToken(), 0);
+                removePins();
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(buildingCoord, 17));
                 mMap.addMarker(new MarkerOptions()
                                      .position(buildingCoord)
@@ -300,6 +295,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 locationAlert.setMessage("Please turn location services on");
                 locationAlert.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface v, int j) {
+                        locationStatus = true;
                         Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivity(i);
                     }
@@ -307,6 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 locationAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface v, int k) {
+                        locationStatus = false;
                     }
                 });
 
@@ -361,22 +358,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        overlay = BitmapDescriptorFactory.fromResource(R.drawable.coloredmap);
+
         LatLng unccNE = new LatLng(35.313029, -80.726618);
 
         LatLng unccSW = new LatLng(35.303262, -80.743691);
 
         LatLngBounds mapBounds = new LatLngBounds(unccSW, unccNE);
 
-        overlay = BitmapDescriptorFactory.fromResource(R.drawable.coloredmap);
-
         GroundOverlayOptions unccMap = new GroundOverlayOptions()
                 .image(overlay)
                 .positionFromBounds(mapBounds);
         mMap.addGroundOverlay(unccMap);
 
+
         // Add a marker in Sydney and move the camera
         LatLng unccUnion = new LatLng(35.308406, -80.733683);
-        float startingZoomLvl = 17;
+        float startingZoomLvl = 16;
         float minimumZoomLvl = 10;
         LatLng SW = new LatLng(35.302771, -80.744404);
         LatLng NE = new LatLng(35.313402, -80.721168);
@@ -396,11 +394,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
 
+
+
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
-                if (mMap.getCameraPosition().zoom < 16) {
-                    mMap.moveCamera(CameraUpdateFactory.zoomTo(16));
+                if (mMap.getCameraPosition().zoom < 15) {
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
                 }
             }
         });
@@ -411,7 +411,101 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getNavDirections(parent_intent);
         }
 
+        clickables = new ArrayList<Polygon>();
+        polyInfo = new HashMap<Polygon, String>();
         setPolygons();
+
+        createButtons();
+
+        mMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(Polygon polygon) {
+
+                String s = "";
+                for (Polygon i : clickables){
+                    if (polygon.equals(i)){
+                        s = polyInfo.get(i);
+                    }
+
+                }
+
+                LatLng pinLoc = coordinates.get(s);
+                removePins();
+
+                Marker currentMark = mMap.addMarker(new MarkerOptions().
+                        icon(BitmapDescriptorFactory.fromResource(R.drawable.pinpoint)).
+                        position(pinLoc).title(s));
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String build = marker.getTitle();
+                marker.setTitle("Navigate to " + build);
+                marker.showInfoWindow();
+
+                return true;
+            }
+        });
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                marker.hideInfoWindow();
+                if(locationStatus == true) {
+                    getDirections(userLoc, marker.getPosition());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMidPoint(userLoc, marker.getPosition()), 15));
+                    goButton.setVisibility(View.VISIBLE);
+                    cancelButton.setVisibility(View.VISIBLE);
+
+                }
+                else{
+                    android.app.AlertDialog.Builder locationAlert = new android.app.AlertDialog.Builder(MapsActivity.this);
+
+                    locationAlert.setMessage("Please turn location services on");
+                    locationAlert.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface v, int j) {
+                            locationStatus = true;
+                            Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(i);
+                        }
+                    });
+
+                    locationAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface v, int k) {
+                        }
+                    });
+
+                    AlertDialog dialog = locationAlert.show();
+                }
+
+                marker.setTitle(marker.getTitle().substring(12));
+
+            }
+        });
+
+        goButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goButton.setVisibility(View.GONE);
+                cancelButton.setVisibility(View.GONE);
+
+
+                //Method to follow user
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goButton.setVisibility(View.GONE);
+                cancelButton.setVisibility(View.GONE);
+                removePins();
+            }
+        });
+
+
 
 
 
@@ -431,46 +525,190 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void loadBuildingHash() {
 
         //Atkins
-        coordinates.put(buildingNames[77], new LatLng(35.305826, -80.732311));
+        coordinates.put(buildingNames[0], new LatLng(35.305826, -80.732311));
+        coordinates.put(buildingNames[60], new LatLng(35.305826, -80.732311));
         //Bioinformatics
-        coordinates.put(buildingNames[78], new LatLng(35.312520, -80.741844));
-        //Barnard
-        coordinates.put(buildingNames[79], new LatLng(35.305887, -80.729845));
-        //Burson
-        coordinates.put(buildingNames[80], new LatLng(35.307703, -80.732476));
-        //Cameron
-        coordinates.put(buildingNames[81], new LatLng(35.307712, -80.731170));
-        //CHHS
-        coordinates.put(buildingNames[82], new LatLng(35.307555, -80.733402));
-        //COED
-        coordinates.put(buildingNames[83], new LatLng(35.307594, -80.734059));
-        //Colvard
-        coordinates.put(buildingNames[84], new LatLng(35.304860, -80.731748));
-        //Fretwell
-        coordinates.put(buildingNames[85], new LatLng(35.306014, -80.729420));
-        //Friday
-        coordinates.put(buildingNames[86], new LatLng(35.306329, -80.730243));
-        //Garinger
-        coordinates.put(buildingNames[87], new LatLng(35.305020, -80.729886));
-        //Belk Gym
-        coordinates.put(buildingNames[88], new LatLng(35.305383, -80.735206));
-        //Student Health Center
-        coordinates.put(buildingNames[89], new LatLng(35.310690, -80.729722));
-        //Johnson Center
-        coordinates.put(buildingNames[90], new LatLng(35.304151, -80.728858));
-        //McEniry
-        coordinates.put(buildingNames[91], new LatLng(35.307024, -80.730331));
-        //McMillan
-        coordinates.put(buildingNames[92], new LatLng(35.307802, -80.729754));
-        //Memorial Hall
-        coordinates.put(buildingNames[93], new LatLng(35.303823, -80.735707));
-        //Robinson
-        coordinates.put(buildingNames[94], new LatLng(35.304272, -80.729907));
-        //Winningham
-        coordinates.put(buildingNames[95], new LatLng(35.305168, -80.730375));
-        //Woodward
-        coordinates.put(buildingNames[96], new LatLng(35.307100, -80.735747));
+        coordinates.put(buildingNames[3], new LatLng(35.312520, -80.741844));
+        coordinates.put(buildingNames[61], new LatLng(35.312520, -80.741844));
 
+        //Barnard
+        coordinates.put(buildingNames[1], new LatLng(35.305887, -80.729845));
+        coordinates.put(buildingNames[62], new LatLng(35.305887, -80.729845));
+
+        //Burson
+        coordinates.put(buildingNames[4], new LatLng(35.307703, -80.732476));
+        coordinates.put(buildingNames[63], new LatLng(35.307703, -80.732476));
+
+        //Cameron
+        coordinates.put(buildingNames[5], new LatLng(35.307712, -80.731170));
+        coordinates.put(buildingNames[64], new LatLng(35.307712, -80.731170));
+
+        //CHHS
+        coordinates.put(buildingNames[16], new LatLng(35.307555, -80.733402));
+        coordinates.put(buildingNames[65], new LatLng(35.307555, -80.733402));
+
+        //COED
+        coordinates.put(buildingNames[6], new LatLng(35.307594, -80.734059));
+        coordinates.put(buildingNames[66], new LatLng(35.307594, -80.734059));
+
+        //Colvard
+        coordinates.put(buildingNames[7], new LatLng(35.304860, -80.731748));
+        coordinates.put(buildingNames[67], new LatLng(35.304860, -80.731748));
+
+        //Fretwell
+        coordinates.put(buildingNames[12], new LatLng(35.306014, -80.729420));
+        coordinates.put(buildingNames[68], new LatLng(35.306014, -80.729420));
+
+        //Friday
+        coordinates.put(buildingNames[13], new LatLng(35.306329, -80.730243));
+        coordinates.put(buildingNames[69], new LatLng(35.306329, -80.730243));
+
+        //Garinger
+        coordinates.put(buildingNames[14], new LatLng(35.305020, -80.729886));
+        coordinates.put(buildingNames[70], new LatLng(35.305020, -80.729886));
+
+        //Belk Gym
+        coordinates.put(buildingNames[2], new LatLng(35.305383, -80.735206));
+        coordinates.put(buildingNames[71], new LatLng(35.305383, -80.735206));
+
+        //Student Health Center
+        coordinates.put(buildingNames[28], new LatLng(35.310690, -80.729722));
+        coordinates.put(buildingNames[72], new LatLng(35.310690, -80.729722));
+
+        //Johnson Center
+        coordinates.put(buildingNames[17], new LatLng(35.304151, -80.728858));
+        coordinates.put(buildingNames[73], new LatLng(35.304151, -80.728858));
+        //McEniry
+        coordinates.put(buildingNames[19], new LatLng(35.307024, -80.730331));
+        coordinates.put(buildingNames[74], new LatLng(35.307024, -80.730331));
+
+        //McMillan
+        coordinates.put(buildingNames[20], new LatLng(35.307802, -80.729754));
+        coordinates.put(buildingNames[75], new LatLng(35.307802, -80.729754));
+
+        //Memorial Hall
+        coordinates.put(buildingNames[21], new LatLng(35.303823, -80.735707));
+        coordinates.put(buildingNames[76], new LatLng(35.303823, -80.735707));
+
+        //Robinson
+        coordinates.put(buildingNames[24], new LatLng(35.304272, -80.729907));
+        coordinates.put(buildingNames[77], new LatLng(35.304272, -80.729907));
+
+        //Winningham
+        coordinates.put(buildingNames[29], new LatLng(35.305168, -80.730375));
+        coordinates.put(buildingNames[78], new LatLng(35.305168, -80.730375));
+
+        //Woodward
+        coordinates.put(buildingNames[30], new LatLng(35.307100, -80.735747));
+        coordinates.put(buildingNames[79], new LatLng(35.307100, -80.735747));
+
+        //Duke
+        coordinates.put(buildingNames[10], new LatLng(35.311911, -80.741184));
+
+        //MotorSports
+        coordinates.put(buildingNames[22], new LatLng(35.312620, -80.740320));
+
+        //Grigg
+        coordinates.put(buildingNames[15], new LatLng(35.311298, -80.741924));
+
+        //PORTAL
+        coordinates.put(buildingNames[23], new LatLng(35.311666, -80.742927));
+
+        //EPIC
+        coordinates.put(buildingNames[11], new LatLng(35.309066, -80.741626));
+
+        //Cone
+        coordinates.put(buildingNames[8], new LatLng(35.305368, -80.733211));
+
+        //Halton
+        coordinates.put(buildingNames[31], new LatLng(35.306309, -80.734390));
+
+        //Rowe
+        coordinates.put(buildingNames[25], new LatLng(35.304512, -80.730743));
+
+        //Storrs
+        coordinates.put(buildingNames[27], new LatLng(35.304565, -80.729190));
+
+        //Prospector
+        coordinates.put(buildingNames[35], new LatLng(35.306824, -80.730893));
+
+        //Macy
+        coordinates.put(buildingNames[18], new LatLng(35.305683, -80.730404));
+
+        //Kennedy
+        coordinates.put(buildingNames[33], new LatLng(35.305982, -80.730925));
+
+        //Smith
+        coordinates.put(buildingNames[26], new LatLng(35.306968, -80.731422));
+
+        //Student Union
+        coordinates.put(buildingNames[37], new LatLng(35.308663, -80.733709));
+
+        //Belk
+        coordinates.put(buildingNames[38], new LatLng(35.310642, -80.734680));
+
+        //Miltimore
+        coordinates.put(buildingNames[52], new LatLng(35.310994, -80.734759));
+
+        //Wallis
+        coordinates.put(buildingNames[58], new LatLng(35.310903, -80.733905));
+
+        //Lynch
+        coordinates.put(buildingNames[48], new LatLng(35.310632, -80.734182));
+
+        //Witherspoon
+        coordinates.put(buildingNames[59], new LatLng(35.310902, -80.732298));
+
+        //Pine
+        coordinates.put(buildingNames[54], new LatLng(35.309300, -80.731398));
+
+        //Maple
+        coordinates.put(buildingNames[49], new LatLng(35.309040, -80.731314));
+
+        //Elm
+        coordinates.put(buildingNames[40], new LatLng(35.308775, -80.731500));
+
+        //Oak
+        coordinates.put(buildingNames[53], new LatLng(35.309046, -80.732252));
+
+        //Cedar
+        coordinates.put(buildingNames[39], new LatLng(35.309580, -80.728965));
+
+        //Hickory
+        coordinates.put(buildingNames[43], new LatLng(35.309197, -80.728966));
+
+        //Sycamore
+        coordinates.put(buildingNames[57], new LatLng(35.308845, -80.728965));
+
+        //Martin
+        coordinates.put(buildingNames[50], new LatLng(35.310036, -80.727464));
+
+        //Hawthorn
+        coordinates.put(buildingNames[42], new LatLng(35.311552, -80.727437));
+
+        //SoVi
+        coordinates.put(buildingNames[36], new LatLng(35.302797, -80.734882));
+
+        //Laurel
+        coordinates.put(buildingNames[46], new LatLng(35.302532, -80.736019));
+
+        //Holshouser
+        coordinates.put(buildingNames[44], new LatLng(35.302134, -80.736059));
+
+        //Hunt
+        coordinates.put(buildingNames[45], new LatLng(35.301385, -80.736174));
+
+        //Moore
+        coordinates.put(buildingNames[51], new LatLng(35.302620, -80.734144));
+
+        //Sanford
+        coordinates.put(buildingNames[55], new LatLng(35.303023, -80.733498));
+
+        //Memorial
+        coordinates.put(buildingNames[21], new LatLng(35.303760, -80.735832));
+
+        //Scott
+        coordinates.put(buildingNames[56], new LatLng(35.301752, -80.735346));
 
     }
 
@@ -509,6 +747,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
 
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMidPoint(from, to), 15));
+
 
 
 
@@ -541,8 +781,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getDirections(navFrom, navTo);
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMidPoint(navFrom, navTo), 15));
-
 
 
     }
@@ -556,19 +794,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng()
         };*/
 
+        /*Polygon  = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng()).
+                add(new LatLng()).
+                add(new LatLng()).
+                add(new LatLng()).visible(false));
+                .setClickable(true);
+                clickables.add();
+                polyInfo.put(, "");*/
+
         Polygon atkins = mMap.addPolygon(new PolygonOptions().
                 add(new LatLng(35.306170, -80.732939)).
                 add(new LatLng(35.305481, -80.732746)).
                 add(new LatLng(35.305488, -80.731303)).
-                add(new LatLng(35.306138, -80.731432)));
+                add(new LatLng(35.306138, -80.731432)).visible(false));
 
         atkins.setClickable(true);
+        clickables.add(atkins);
+        polyInfo.put(atkins, "ATKNS (Atkins)");
 
         Polygon burson = mMap.addPolygon(new PolygonOptions().
                 add(new LatLng(35.307739, -80.733080)).
                 add(new LatLng(35.307730, -80.731912)).
                 add(new LatLng(35.307095, -80.731933)).
-                add(new LatLng(35.307401, -80.733011)));
+                add(new LatLng(35.307401, -80.733011)).visible(false));
+
+        burson.setClickable(true);
+        clickables.add(burson);
+        polyInfo.put(burson, "BURSN (Burson)");
 
         Polygon chhs = mMap.addPolygon(new PolygonOptions().
                 add(new LatLng(35.307943, -80.733577)).
@@ -576,8 +829,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 add(new LatLng(35.307229, -80.733119)).
                 add(new LatLng(35.307067, -80.732931)).
                 add(new LatLng(35.306866, -80.733140)).
-                add(new LatLng(35.306899, -80.733585)));
+                add(new LatLng(35.306899, -80.733585)).visible(false));
 
+        chhs.setClickable(true);
+        clickables.add(chhs);
+        polyInfo.put(chhs, "CHHS (College of Health & Human Services)");
+
+        Polygon coed = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng(35.307884, -80.734392)).
+                add(new LatLng(35.307256, -80.734403)).
+                add(new LatLng(35.307236, -80.733816)).
+                add(new LatLng(35.307877, -80.733832)).visible(false));
+        coed.setClickable(true);
+        clickables.add(coed);
+        polyInfo.put(coed, "COED (College of Education)");
+
+        Polygon fret = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng(35.306484, -80.729419)).
+                add(new LatLng(35.306092, -80.728469)).
+                add(new LatLng(35.305862, -80.728466)).
+                add(new LatLng(35.305853, -80.729429)).visible(false));
+        fret.setClickable(true);
+        clickables.add(fret);
+        polyInfo.put(fret, "FRET (Fretwell)");
+
+        Polygon friday = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng(35.306642, -80.730224)).
+                add(new LatLng(35.306622, -80.729663)).
+                add(new LatLng(35.306031, -80.729660)).
+                add(new LatLng(35.306040, -80.730226)).visible(false));
+        friday.setClickable(true);
+        clickables.add(friday);
+        polyInfo.put(friday, "FRIDY (Friday)");
+
+        Polygon belkGym = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng(35.305742, -80.736208)).
+                add(new LatLng(35.305764, -80.735194)).
+                add(new LatLng(35.304994, -80.735199)).
+                add(new LatLng(35.304968, -80.736213)).visible(false));
+        belkGym.setClickable(true);
+        clickables.add(belkGym);
+        polyInfo.put(belkGym, "GYMNS (Belk Gym)");
+
+        Polygon mcmil  = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng(35.308014, -80.729892)).
+                add(new LatLng(35.308012, -80.729575)).
+                add(new LatLng(35.307629, -80.729570)).
+                add(new LatLng(35.307636, -80.729897)).visible(false));
+        mcmil.setClickable(true);
+        clickables.add(mcmil);
+        polyInfo.put(mcmil, "MCMIL (McMillan)");
+
+
+
+        Polygon wood = mMap.addPolygon(new PolygonOptions().
+                add(new LatLng(35.307616, -80.735894)).
+                add(new LatLng(35.306812, -80.735910)).
+                add(new LatLng(35.306799, -80.735567)).
+                add(new LatLng(35.307370, -80.735527)).
+                add(new LatLng(35.307370, -80.734706)).
+                add(new LatLng(35.307659, -80.734706)).visible(false));
+        wood.setClickable(true);
+        clickables.add(wood);
+        polyInfo.put(wood, "WOODW (Woodward)");
+
+
+        System.gc();
     }
 
     @Override
@@ -615,7 +932,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onBackPressed(){
 
         super.onBackPressed();
-
-        mMap.clear();
     }
+
+    public void removePins(){
+        mMap.clear();
+
+        LatLng unccNE = new LatLng(35.313029, -80.726618);
+
+        LatLng unccSW = new LatLng(35.303262, -80.743691);
+
+        LatLngBounds mapBounds = new LatLngBounds(unccSW, unccNE);
+
+
+
+        GroundOverlayOptions unccMap = new GroundOverlayOptions()
+                .image(overlay)
+                .positionFromBounds(mapBounds);
+        mMap.addGroundOverlay(unccMap);
+
+        setPolygons();
+
+    }
+
+    public void createButtons(){
+        goButton = (Button) findViewById(R.id.button7);
+        cancelButton = (Button) findViewById(R.id.button5);
+
+        goButton.setText("Go");
+        cancelButton.setText("Cancel");
+
+        goButton.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
+    }
+
 }
