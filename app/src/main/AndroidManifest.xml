@@ -24,17 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NavigationScreen"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_navigation_screen"
-            android:parentActivityName=".MainScreen"
-            android:theme="@style/FullscreenTheme"
-            android:screenOrientation="locked">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="niners.ninernav.MainScreen" />
-        </activity>
-        <activity
             android:name=".SettingsScreen"
             android:label="@string/title_activity_settings_screen"
             android:parentActivityName=".MainScreen">

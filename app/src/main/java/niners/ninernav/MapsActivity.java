@@ -10,6 +10,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.*;
 import android.os.Build;
 import android.provider.Settings;
@@ -19,19 +23,6 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.app.AlertDialog.Builder;
 import android.graphics.Color;
-
-
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.lang.Object;
-import java.lang.reflect.Array;
-import java.net.URL;
-import java.net.HttpURLConnection;
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.BufferedReader;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.model.Direction;
@@ -95,6 +86,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static int parent_id;
     private static Intent parent_intent;
     private static boolean locationStatus = true;
+
+    private static float userDir;
+    private static boolean followUser = false;
+    private static Marker currentMark;
 
     private static ArrayAdapter<String> places;
     private static GoogleApiClient mGAPIC;
@@ -251,7 +246,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String userSelection = textEntry.getText().toString();
                 LatLng buildingCoord = coordinates.get(userSelection);
                 imm.hideSoftInputFromWindow(textEntry.getWindowToken(), 0);
+                System.gc();
                 removePins();
+                System.gc();
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(buildingCoord, 17));
                 mMap.addMarker(new MarkerOptions()
                                      .position(buildingCoord)
@@ -276,6 +273,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 userLat = location.getLatitude();
                 userLong = location.getLongitude();
                 userLoc = new LatLng(userLat, userLong);
+
+                if (followUser){
+                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLoc, 18));
+                }
 
             }
 
@@ -325,6 +326,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Get updates from location manager every 3 seconds (3000 milliseconds) from "network" (wifi coordinates)
         locManage.requestLocationUpdates("network", 3000, 0, locListen);
 
+
         if((this.getIntent().getExtras().getInt("calledActivity") == 2) && !(this.getIntent().equals(null))){
             inNavMode = true;
             parent_intent = this.getIntent();
@@ -371,6 +373,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .positionFromBounds(mapBounds);
         mMap.addGroundOverlay(unccMap);
 
+        createButtons();
+
 
         // Add a marker in Sydney and move the camera
         LatLng unccUnion = new LatLng(35.308406, -80.733683);
@@ -409,13 +413,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Location currLoc = locManage.getLastKnownLocation("network");
             userLoc = new LatLng(currLoc.getLatitude(), currLoc.getLongitude());
             getNavDirections(parent_intent);
+            goButton.setVisibility(View.VISIBLE);
+            cancelButton.setVisibility(View.VISIBLE);
         }
 
         clickables = new ArrayList<Polygon>();
         polyInfo = new HashMap<Polygon, String>();
         setPolygons();
 
-        createButtons();
+
 
         mMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
             @Override
@@ -489,10 +495,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 goButton.setVisibility(View.GONE);
-                cancelButton.setVisibility(View.GONE);
+                //cancelButton.setVisibility(View.GONE);
 
 
                 //Method to follow user
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLoc, 18));
+
+
             }
         });
 
@@ -501,6 +510,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 goButton.setVisibility(View.GONE);
                 cancelButton.setVisibility(View.GONE);
+                followUser = false;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLoc, 16));
                 removePins();
             }
         });
@@ -963,6 +974,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         goButton.setVisibility(View.GONE);
         cancelButton.setVisibility(View.GONE);
+    }
+
+    public void followUser(){
+        followUser = true;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLoc, 17));
+
     }
 
 }
